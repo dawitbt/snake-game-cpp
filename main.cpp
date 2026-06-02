@@ -4,10 +4,14 @@
 #include <mmsystem.h>
 #include <stdlib.h>
 #include <cstdio>
+#include <ctime>
 #include "grid.h"
 
 #define COLUMNS 40
 #define ROWS 40
+
+bool difficultySelected = false;
+bool showSelectWarning = false;
 
 // State tracking variables
 int FPS = 10;
@@ -28,7 +32,6 @@ void init() {
 }
 
 int main(int argc, char **argv) {
-    // Initializing background configuration thread
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
     glutInitWindowSize(600, 600);
@@ -40,7 +43,9 @@ int main(int argc, char **argv) {
     glutTimerFunc(0, timer, 0);
 
     glutSpecialFunc(keyboardSpecial);   // Handle arrow keys
-    glutKeyboardFunc(keyboardNormal);   // Handle structural alphanumeric keys (Space, P, R)
+    glutKeyboardFunc(keyboardNormal);
+
+    srand(time(0));
 
     init();
     glutMainLoop();
@@ -50,7 +55,6 @@ int main(int argc, char **argv) {
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // Dynamic Frame Routing Matrix
     switch(gameState) {
         case STATE_MENU:
             drawMenuScreen();
@@ -61,8 +65,8 @@ void display() {
             drawFood();
 
             // On-screen Real-time Dashboard HUD
-            char hudText[30];
-            sprintf(hudText, "Score: %d | High: %d", score, highScore);
+            char hudText[50];
+            sprintf(hudText, "Score:%d | High:%d | Speed:%d", score, highScore, FPS);
             drawText(hudText, 1.0f, ROWS - 1.5f, GLUT_BITMAP_HELVETICA_12, 0.0f, 1.0f, 1.0f);
             break;
         case STATE_PAUSED:
@@ -86,17 +90,44 @@ void reshape(int w, int h) {
 }
 
 void timer(int v) {
+    if(gameState == STATE_PLAYING) {
+        updateSnake();
+    }
+
     glutPostRedisplay();
-    // Dynamically tracking global clock speed step modifications
     glutTimerFunc(1000 / FPS, timer, 0);
 }
 
-// Special Alphanumeric Listener Routing (Char Maps)
 void keyboardNormal(unsigned char key, int x, int y) {
     switch(key) {
-        case ' ': // Space Bar
+        case ' ':
             if (gameState == STATE_MENU) {
-                gameState = STATE_PLAYING;
+                if (difficultySelected) {
+                    resetGame(); // Transitions to STATE_PLAYING inside reset
+                } else {
+                    showSelectWarning = true;
+                }
+            }
+            break;
+        case '1':
+            if (gameState == STATE_MENU) {
+                FPS = 8;
+                difficultySelected = true;
+                showSelectWarning = false;
+            }
+            break;
+        case '2':
+            if (gameState == STATE_MENU) {
+                FPS = 12;
+                difficultySelected = true;
+                showSelectWarning = false;
+            }
+            break;
+        case '3':
+            if (gameState == STATE_MENU) {
+                FPS = 18;
+                difficultySelected = true;
+                showSelectWarning = false;
             }
             break;
         case 'p':
@@ -108,20 +139,20 @@ void keyboardNormal(unsigned char key, int x, int y) {
             }
             break;
         case 'r':
-        case 'R': // Reset System
+        case 'R': // Reset System and send to Menu
             if (gameState == STATE_GAMEOVER) {
-                resetGame();
+                gameState = STATE_MENU;
+                difficultySelected = false; // Prompt select speed again
             }
             break;
-        case 27: // Escape Code key sequence
+        case 27: // Escape key
             exit(0);
             break;
     }
 }
 
-// Structural Directional Key Listener Maps
 void keyboardSpecial(int key, int x, int y) {
-    if (gameState != STATE_PLAYING) return; // Ignore input when not playing
+    if (gameState != STATE_PLAYING) return;
 
     switch(key) {
         case GLUT_KEY_UP:
@@ -138,4 +169,3 @@ void keyboardSpecial(int key, int x, int y) {
             break;
     }
 }
-
