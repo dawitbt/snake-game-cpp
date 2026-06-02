@@ -14,14 +14,19 @@
 #define STATE_PAUSED 2
 #define STATE_GAMEOVER 3
 
+// Core Globals referenced across files
+extern bool showSelectWarning;
+extern bool difficultySelected;
+
 // Core Functions
 void initGrid(int, int);
 void drawGrid();
 void drawSnake();
+void updateSnake();
 void drawFood();
 void random(int&, int&);
 
-// New UI and Text Rendering Functions
+// UI and Text Rendering Functions
 void drawText(const char* text, float x, float y, void* font, float r, float g, float b);
 void drawMenuScreen();
 void drawPauseScreen();
@@ -33,4 +38,3 @@ void loadHighScore();
 void saveHighScore();
 
 #endif // GRID_H_INCLUDED
-
