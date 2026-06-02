@@ -59,13 +59,13 @@ SnakeGame/
 
 # 📸 Screenshots
 
-## 🎮 Gameplay
-
-![Gameplay Screenshot](screenshots/gameplay.png)
-
-## 💀 Game Over Screen
+## 🎮 Game menu
 
 ![Game Over Screenshot](screenshots/gameover.png)
+
+## Gameplay
+
+![Gameplay Screenshot](screenshots/gameplay.png)
 
 ---
 
